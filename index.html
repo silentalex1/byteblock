@@ -557,7 +557,7 @@
             e.preventDefault();
             const projectName = document.getElementById('projectName').value;
             if (projectName.trim()) {
-                // Store the project in localStorage to persist it
+                
                 const projects = JSON.parse(localStorage.getItem('byteblock-projects') || '[]');
                 const newProject = {
                     id: Date.now().toString(),
@@ -568,7 +568,7 @@
                 projects.push(newProject);
                 localStorage.setItem('byteblock-projects', JSON.stringify(projects));
                 
-                // Redirect to the project page
+                
                 window.location.href = `/project.html?id=${newProject.id}`;
             }
         });
