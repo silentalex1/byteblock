@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ByteBlock - Best Code Obfuscation</title>
+    <style>
+        :root {
+            --primary: #00e0e0;
+            --primary-dark: #00b0b0;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --light: #f5f5f5;
+            --gray: #9e9e9e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+        }
+        
+        header {
+            background-color: var(--darker);
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 10px rgba(0, 224, 224, 0.2);
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            margin-right: 10px;
+        }
+        
+        main {
+            padding: 3rem 0;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #ffffff, var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--gray);
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+        
+        .feature-card {
+            background-color: rgba(0, 224, 224, 0.05);
+            border-radius: 10px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 224, 224, 0.1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 224, 224, 0.1);
+            border-color: rgba(0, 224, 224, 0.3);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        .feature-description {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+        
+        .workspace {
+            background-color: rgba(0, 224, 224, 0.03);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px dashed rgba(0, 224, 224, 0.2);
+        }
+        
+        .new-file-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background-color: var(--primary);
+            color: var(--dark);
+            font-size: 2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 224, 224, 0.3);
+        }
+        
+        .new-file-btn:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.05);
+        }
+        
+        .new-file-text {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: var(--darker);
+            border-radius: 10px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 0 20px rgba(0, 224, 224, 0.3);
+            border: 1px solid rgba(0, 224, 224, 0.1);
+        }
+        
+        .modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--light);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background-color: var(--dark);
+            border: 1px solid rgba(0, 224, 224, 0.2);
+            border-radius: 5px;
+            color: var(--light);
+            font-size: 1rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 5px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-cancel {
+            background-color: transparent;
+            color: var(--gray);
+            border: 1px solid var(--gray);
+        }
+        
+        .btn-cancel:hover {
+            background-color: rgba(158, 158, 158, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 224, 224, 0.2) 0%, rgba(0, 224, 224, 0) 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .footer {
+            padding: 2rem 0;
+            border-top: 1px solid rgba(158, 158, 158, 0.1);
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-brand {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .footer-link {
+            color: var(--gray);
+            text-decoration: none;
+        }
+        
+        .footer-link:hover {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="glow"></div>
+    
+    <header>
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">⬢</span> ByteBlock
+            </div>
+        </div>
+    </header>
+    
+    <main class="container">
+        <section class="hero">
+            <h1>Transform Your Code Into Unreadable Puzzles</h1>
+            <p class="subtitle">ByteBlock uses cutting-edge techniques to shield your intellectual property through sophisticated code obfuscation that remains fully functional.</p>
+        </section>
+        
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Military-Grade Protection</h3>
+                <p class="feature-description">Our engine transforms your source code using advanced algorithms that make reverse engineering nearly impossible while preserving functionality.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Zero Performance Impact</h3>
+                <p class="feature-description">ByteBlock delivers secure obfuscation without slowing down your application, maintaining optimal execution speed and efficiency.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3 class="feature-title">Multi-Language Support</h3>
+                <p class="feature-description">Protect your JavaScript, Python, Java, C#, PHP and more with language-specific obfuscation techniques tailored to each syntax.</p>
+            </div>
+        </section>
+        
+        <section class="workspace">
+            <button class="new-file-btn" id="newFileBtn">+</button>
+            <p class="new-file-text">Click button above to create new file</p>
+        </section>
+    </main>
+    
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-brand">ByteBlock</div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">Docs</a>
+                <a href="#" class="footer-link">Pricing</a>
+                <a href="#" class="footer-link">Support</a>
+            </div>
+        </div>
+    </footer>
+    
+    <div class="modal" id="newProjectModal">
+        <div class="modal-content">
+            <h2 class="modal-title">Create New Project</h2>
+            <form id="newProjectForm">
+                <div class="form-group">
+                    <label for="projectName" class="form-label">Project Name</label>
+                    <input type="text" id="projectName" class="form-input" placeholder="Enter project name" required>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        const newFileBtn = document.getElementById('newFileBtn');
+        const newProjectModal = document.getElementById('newProjectModal');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const newProjectForm = document.getElementById('newProjectForm');
+        
+        newFileBtn.addEventListener('click', () => {
+            newProjectModal.style.display = 'flex';
+        });
+        
+        cancelBtn.addEventListener('click', () => {
+            newProjectModal.style.display = 'none';
+        });
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === newProjectModal) {
+                newProjectModal.style.display = 'none';
+            }
+        });
+        
+        newProjectForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const projectName = document.getElementById('projectName').value;
+            if (projectName.trim()) {
+                window.location.href = `/project/${encodeURIComponent(projectName)}`;
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const glowElement = document.querySelector('.glow');
+            
+            document.addEventListener('mousemove', (e) => {
+                const x = e.clientX;
+                const y = e.clientY;
+                
+                glowElement.style.left = `${x}px`;
+                glowElement.style.top = `${y}px`;
+            });
+        });
+    </script>
+</body>
+</html>
