@@ -505,7 +505,6 @@
     </div>
     
     <script>
-        // Create floating particles effect
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             const particleCount = 20;
@@ -514,14 +513,9 @@
                 const particle = document.createElement('div');
                 particle.classList.add('particle');
                 
-                // Random position
                 const posX = Math.random() * 100;
                 const posY = Math.random() * 100;
-                
-                // Random size
                 const size = Math.random() * 5 + 2;
-                
-                // Random animation delay
                 const delay = Math.random() * 8;
                 
                 particle.style.left = `${posX}%`;
@@ -539,25 +533,24 @@
         const cancelBtn = document.getElementById('cancelBtn');
         const newProjectForm = document.getElementById('newProjectForm');
         
-        newFileBtn.addEventListener('click', () => {
+        newFileBtn.addEventListener('click', function() {
             newProjectModal.style.display = 'flex';
         });
         
-        cancelBtn.addEventListener('click', () => {
+        cancelBtn.addEventListener('click', function() {
             newProjectModal.style.display = 'none';
         });
         
-        window.addEventListener('click', (e) => {
+        window.addEventListener('click', function(e) {
             if (e.target === newProjectModal) {
                 newProjectModal.style.display = 'none';
             }
         });
         
-        newProjectForm.addEventListener('submit', (e) => {
+        newProjectForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const projectName = document.getElementById('projectName').value;
             if (projectName.trim()) {
-                
                 const projects = JSON.parse(localStorage.getItem('byteblock-projects') || '[]');
                 const newProject = {
                     id: Date.now().toString(),
@@ -568,24 +561,23 @@
                 projects.push(newProject);
                 localStorage.setItem('byteblock-projects', JSON.stringify(projects));
                 
-                
                 window.location.href = `/project.html?id=${newProject.id}`;
             }
         });
         
-        document.addEventListener('DOMContentLoaded', () => {
+        window.onload = function() {
             createParticles();
             
             const glowElement = document.querySelector('.glow');
             
-            document.addEventListener('mousemove', (e) => {
+            document.addEventListener('mousemove', function(e) {
                 const x = e.clientX;
                 const y = e.clientY;
                 
                 glowElement.style.left = `${x}px`;
                 glowElement.style.top = `${y}px`;
             });
-        });
+        };
     </script>
 </body>
 </html>
