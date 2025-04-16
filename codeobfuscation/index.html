@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ByteBlock - Code Protection Suite</title>
+    <title>ByteBlock - Code Protection.</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -953,7 +953,7 @@ function obfuscateJs(code, opts) {
     return result;
 }
 
-// Deobfuscate JavaScript code
+
 function deobfuscateJs(code, opts) {
     if (!obfuscationMap.js) throw new Error('No mapping found');
     let result = code;
@@ -986,7 +986,7 @@ function deobfuscateJs(code, opts) {
     return result;
 }
 
-// Obfuscate Python code
+
 function obfuscatePython(code, opts) {
     let result = code;
     obfuscationMap.python = { vars: {}, strings: {} };
@@ -1022,7 +1022,7 @@ function obfuscatePython(code, opts) {
     return result;
 }
 
-// Deobfuscate Python code
+            
 function deobfuscatePython(code, opts) {
     if (!obfuscationMap.python) throw new Error('No mapping found');
     let result = code;
@@ -1055,7 +1055,7 @@ function deobfuscatePython(code, opts) {
     return result;
 }
 
-// Obfuscate Java code
+
 function obfuscateJava(code, opts) {
     let result = code;
     obfuscationMap.java = { vars: {}, strings: {} };
@@ -1091,7 +1091,7 @@ function obfuscateJava(code, opts) {
     return result;
 }
 
-// Deobfuscate Java code
+
 function deobfuscateJava(code, opts) {
     if (!obfuscationMap.java) throw new Error('No mapping found');
     let result = code;
@@ -1123,7 +1123,7 @@ function deobfuscateJava(code, opts) {
     return result;
 }
 
-// Obfuscate C++ code
+
 function obfuscateCpp(code, opts) {
     let result = code;
     obfuscationMap.cpp = { vars: {}, strings: {} };
@@ -1159,7 +1159,7 @@ function obfuscateCpp(code, opts) {
     return result;
 }
 
-// Deobfuscate C++ code
+
 function deobfuscateCpp(code, opts) {
     if (!obfuscationMap.cpp) throw new Error('No mapping found');
     let result = code;
@@ -1191,7 +1191,7 @@ function deobfuscateCpp(code, opts) {
     return result;
 }
 
-// Obfuscate PHP code
+
 function obfuscatePhp(code, opts) {
     let result = code;
     obfuscationMap.php = { vars: {}, strings: {} };
@@ -1295,7 +1295,7 @@ function obfuscateRuby(code, opts) {
     return result;
 }
 
-// Deobfuscate Ruby code
+            
 function deobfuscateRuby(code, opts) {
     if (!obfuscationMap.ruby) throw new Error('No mapping found');
     let result = code;
