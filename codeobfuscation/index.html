@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ByteBlock - Code Protection.</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Poppins', Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1a1a1a 0%, #2c2c2c 100%);
+            color: #e5e5e5;
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        
+        header {
+            background: rgba(20, 20, 20, 0.9);
+            padding: 18px 0;
+            border-bottom: 1px solid #3a3a3a;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 35px;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 600;
+            color: #00c4c4;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.03);
+            color: #00e4e4;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 35px;
+        }
+
+        .nav-link {
+            color: #b5b5b5;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -6px;
+            left: 0;
+            background: #00c4c4;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: #00c4c4;
+        }
+
+        
+        .editor-section {
+            padding: 60px 0;
+        }
+
+        .editor-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .editor-header h1 {
+            font-size: 38px;
+            font-weight: 700;
+            margin-bottom: 18px;
+            color: #ffffff;
+            background: linear-gradient(45deg, #00c4c4, #009a9a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .editor-header p {
+            color: #b5b5b5;
+            max-width: 750px;
+            margin: 0 auto;
+            font-size: 18px;
+            line-height: 1.8;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .editor-container {
+            background: rgba(28, 28, 28, 0.98);
+            border: 1px solid #424242;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .editor-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #424242;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 6px;
+        }
+
+        .tab {
+            padding: 12px 22px;
+            background: #2c2c2c;
+            border: 1px solid #424242;
+            border-bottom: none;
+            color: #b5b5b5;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: #1c1c1c;
+            color: #00c4c4;
+            border-top: 3px solid #00c4c4;
+        }
+
+        .tab:hover {
+            color: #00c4c4;
+            background: #353535;
+            transform: translateY(-2px);
+        }
+
+        .code-editor {
+            position: relative;
+            min-height: 650px;
+            background: #1c1c1c;
+            border: 1px solid #424242;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .code-editor:hover {
+            box-shadow: 0 6px 20px rgba(0, 196, 196, 0.25);
+        }
+
+        .code-editor-wrapper {
+            display: flex;
+        }
+
+        .line-numbers {
+            width: 50px;
+            background: #2c2c2c;
+            color: #757575;
+            text-align: right;
+            padding: 15px 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 15px;
+            line-height: 1.7;
+            user-select: none;
+            border-right: 1px solid #424242;
+        }
+
+        .code-input {
+            flex: 1;
+            min-height: 650px;
+            background: transparent;
+            border: none;
+            color: #e5e5e5;
+            resize: none;
+            font-family: 'Consolas', monospace;
+            font-size: 15px;
+            padding: 15px;
+            line-height: 1.7;
+            transition: border 0.3s ease;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border: 1px solid #00c4c4;
+            box-shadow: inset 0 0 10px rgba(0, 196, 196, 0.3);
+        }
+
+        .prism-highlight {
+            position: absolute;
+            top: 0;
+            left: 50px;
+            width: calc(100% - 50px);
+            height: 100%;
+            pointer-events: none;
+            padding: 15px;
+            line-height: 1.7;
+            font-size: 15px;
+            font-family: 'Consolas', monospace;
+            background: #1c1c1c;
+        }
+
+        .options-panel {
+            margin: 25px 0;
+            padding: 20px;
+            border: 1px solid #424242;
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 30px;
+            background: #272727;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #b5b5b5;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .option input {
+            accent-color: #00c4c4;
+            width: 18px;
+            height: 18px;
+        }
+
+        .editor-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #00c4c4;
+            color: #1c1c1c;
+        }
+
+        .btn-primary:hover {
+            background: #009a9a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 196, 196, 0.3);
+        }
+
+        .btn-secondary {
+            background: #424242;
+            color: #e5e5e5;
+            border: 1px solid #525252;
+        }
+
+        .btn-secondary:hover {
+            background: #525252;
+            transform: translateY(-2px);
+        }
+
+        .btn-tertiary {
+            background: #626262;
+            color: #e5e5e5;
+        }
+
+        .btn-tertiary:hover {
+            background: #727272;
+            transform: translateY(-2px);
+        }
+
+        /* Output Section Styles */
+        .output-section {
+            margin-top: 40px;
+            padding: 25px;
+            background: #272727;
+            border: 1px solid #424242;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .output-section h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #00c4c4;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .output-code {
+            background: #1c1c1c;
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 450px;
+            font-family: 'Consolas', monospace;
+            font-size: 15px;
+            color: #e5e5e5;
+            white-space: pre-wrap;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .copy-btn, .download-btn {
+            position: absolute;
+            top: 20px;
+            padding: 10px 18px;
+            background: #00c4c4;
+            color: #1c1c1c;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn {
+            right: 90px;
+        }
+
+        .download-btn {
+            right: 20px;
+        }
+
+        .copy-btn:hover, .download-btn:hover {
+            background: #009a9a;
+            transform: translateY(-2px);
+        }
+
+        .status-bar {
+            margin-top: 20px;
+            padding: 12px;
+            font-size: 15px;
+            color: #b5b5b5;
+            text-align: right;
+            background: #2c2c2c;
+            border-radius: 6px;
+        }
+
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #2c2c2c;
+            padding: 35px;
+            border-radius: 10px;
+            max-width: 550px;
+            width: 90%;
+            color: #e5e5e5;
+            position: relative;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content h3 {
+            font-size: 26px;
+            margin-bottom: 20px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .modal-content p {
+            font-size: 16px;
+            margin-bottom: 25px;
+            line-height: 1.7;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #424242;
+            color: #e5e5e5;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #525252;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+
+            .editor-header h1 {
+                font-size: 30px;
+            }
+
+            .editor-header p {
+                font-size: 16px;
+            }
+
+            .code-editor, .code-input {
+                min-height: 550px;
+            }
+
+            .options-panel {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .editor-actions {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <span>⬢</span> ByteBlock
+                </div>
+                <div class="nav-links">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/docs" class="nav-link">Documentation</a>
+                    <a href="/support" class="nav-link">Support</a>
+                    <a href="/pricing" class="nav-link">Pricing</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    
+    <main class="container">
+        <section class="editor-section">
+            
+            <div class="editor-header">
+                <h1>Code Protection Suite</h1>
+                <p>Secure your codebase with powerful obfuscation and deobfuscation tools. Supports multiple languages with customizable protection options.</p>
+            </div>
+
+            
+            <div class="editor-container">
+                
+                <div class="editor-tabs">
+                    <button class="tab active" data-lang="html" role="tab" aria-selected="true">HTML</button>
+                    <button class="tab" data-lang="javascript" role="tab" aria-selected="false">JavaScript</button>
+                    <button class="tab" data-lang="python" role="tab" aria-selected="false">Python</button>
+                    <button class="tab" data-lang="java" role="tab" aria-selected="false">Java</button>
+                    <button class="tab" data-lang="cpp" role="tab" aria-selected="false">C++</button>
+                    <button class="tab" data-lang="php" role="tab" aria-selected="false">PHP</button>
+                    <button class="tab" data-lang="ruby" role="tab" aria-selected="false">Ruby</button>
+                    <button class="tab" data-lang="typescript" role="tab" aria-selected="false">TypeScript</button>
+                </div>
+
+                
+                <div class="code-editor">
+                    <div class="code-editor-wrapper">
+                        <div class="line-numbers" id="lineNumbers"></div>
+                        <textarea class="code-input" placeholder="Paste your HTML code here..." aria-label="Code input area"></textarea>
+                    </div>
+                    <pre class="prism-highlight language-html"></pre>
+                </div>
+
+                
+                <div class="options-panel">
+                    <label class="option">
+                        <input type="checkbox" checked> Variable Renaming
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" checked> String Encryption
+                    </label>
+                    <label class="option">
+                        <input type="checkbox"> Control Flow Flattening
+                    </label>
+                    <label class="option">
+                        <input type="checkbox"> Dead Code Injection
+                    </label>
+                    <label class="option">
+                        <input type="checkbox"> Code Compression
+                    </label>
+                </div>
+
+                
+                <div class="editor-actions">
+                    <button class="btn btn-secondary">Clear</button>
+                    <button class="btn btn-tertiary">Deobfuscate</button>
+                    <button class="btn btn-primary">Obfuscate</button>
+                </div>
+
+                
+                <div class="status-bar" id="status">Ready</div>
+            </div>
+
+            
+            <div class="output-section">
+                <h2>Processed Output</h2>
+                <div class="output-code" id="outputCode"></div>
+                <button class="copy-btn">Copy</button>
+                <button class="download-btn">Download</button>
+            </div>
+        </section>
+    </main>
+
+    
+    <div class="modal" id="statusModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">Close</button>
+            <h3 id="modalTitle">Processing Status</h3>
+            <p id="modalMessage"></p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ruby.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script>
+        
+        const tabs = document.querySelectorAll('.tab');
+        const codeInput = document.querySelector('.code-input');
+        const lineNumbers = document.querySelector('#lineNumbers');
+        const highlightPre = document.querySelector('.prism-highlight');
+        const clearBtn = document.querySelector('.btn-secondary');
+        const deobfuscateBtn = document.querySelector('.btn-tertiary');
+        const obfuscateBtn = document.querySelector('.btn-primary');
+        const outputCode = document.querySelector('#outputCode');
+        const copyBtn = document.querySelector('.copy-btn');
+        const downloadBtn = document.querySelector('.download-btn');
+        const statusBar = document.querySelector('#status');
+        const statusModal = document.querySelector('#statusModal');
+        const modalMessage = document.querySelector('#modalMessage');
+        const modalClose = document.querySelector('.modal-close');
+        const options = document.querySelectorAll('.option input');
+        let obfuscationMap = {};
+
+        
+        tabs.forEach(tab => {
+            if (tab.classList.contains('active')) {
+                tab.setAttribute('aria-selected', 'true');
+            } else {
+                tab.setAttribute('aria-selected', 'false');
+            }
+        });
+
+        
+        function updateLineNumbers() {
+            const lines = codeInput.value.split('\n').length;
+            let numbers = '';
+            for (let i = 1; i <= lines; i++) {
+                numbers += i + '\n';
+            }
+            lineNumbers.textContent = numbers;
+        }
+
+        
+        function updateHighlight() {
+            const lang = document.querySelector('.tab.active').dataset.lang;
+            highlightPre.className = `prism-highlight language-${lang === 'html' ? 'markup' : lang}`;
+            highlightPre.textContent = codeInput.value;
+            Prism.highlightElement(highlightPre);
+            updateLineNumbers();
+        }
+
+        
+        function showStatus(message, isError = false, useModal = false) {
+            const start = performance.now();
+            if (useModal) {
+                modalMessage.textContent = message;
+                statusModal.style.display = 'flex';
+            } else {
+                statusBar.textContent = message;
+                statusBar.style.color = isError ? '#ff5555' : '#b5b5b5';
+                setTimeout(() => {
+                    const duration = ((performance.now() - start) / 1000).toFixed(2);
+                    statusBar.textContent = isError ? 'Error occurred' : `Completed in ${duration}s`;
+                    statusBar.style.color = '#b5b5b5';
+                }, 2000);
+            }
+        }
+
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+                codeInput.placeholder = `Paste your ${tab.dataset.lang.toUpperCase()} code here...`;
+                codeInput.value = '';
+                outputCode.textContent = '';
+                obfuscationMap = {};
+                updateHighlight();
+            });
+        });
+
+        
+        codeInput.addEventListener('input', updateHighlight);
+        codeInput.addEventListener('scroll', () => {
+            highlightPre.scrollTop = codeInput.scrollTop;
+            lineNumbers.scrollTop = codeInput.scrollTop;
+        });
+
+
+        clearBtn.addEventListener('click', () => {
+            codeInput.value = '';
+            outputCode.textContent = '';
+            obfuscationMap = {};
+            updateHighlight();
+            showStatus('Code cleared successfully');
+        });
+
+        
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(outputCode.textContent).then(() => {
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => copyBtn.textContent = 'Copy', 2000);
+                showStatus('Code copied to clipboard');
+            }).catch(() => {
+                showStatus('Failed to copy code', true, true);
+            });
+        });
+
+        
+        downloadBtn.addEventListener('click', () => {
+            const lang = document.querySelector('.tab.active').dataset.lang;
+            const blob = new Blob([outputCode.textContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `protected.${lang === 'html' ? 'html' : lang === 'javascript' ? 'js' : lang === 'cpp' ? 'cpp' : lang}`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showStatus('Code downloaded successfully');
+        });
+
+        
+        modalClose.addEventListener('click', () => {
+            statusModal.style.display = 'none';
+        });
+
+        
+        obfuscateBtn.addEventListener('click', () => {
+            const code = codeInput.value.trim();
+            if (!code) {
+                outputCode.textContent = '';
+                showStatus('Please provide code to protect.', true, true);
+                return;
+            }
+
+            showStatus('Processing protection...');
+            const lang = document.querySelector('.tab.active').dataset.lang;
+            const opts = {
+                varRename: options[0].checked,
+                strEncrypt: options[1].checked,
+                flowFlatten: options[2].checked,
+                deadCode: options[3].checked,
+                compress: options[4].checked
+            };
+
+            setTimeout(() => {
+                try {
+                    let result;
+                    obfuscationMap = {};
+                    if (lang === 'html') {
+                        result = obfuscateHtml(code, opts);
+                    } else if (lang === 'javascript') {
+                        result = obfuscateJs(code, opts);
+                    } else if (lang === 'python') {
+                        result = obfuscatePython(code, opts);
+                    } else if (lang === 'java') {
+                        result = obfuscateJava(code, opts);
+                    } else if (lang === 'cpp') {
+                        result = obfuscateCpp(code, opts);
+     } else if (lang === 'php') {
+    result = obfuscatePhp(code, opts);
+} else if (lang === 'ruby') {
+    result = obfuscateRuby(code, opts);
+} else if (lang === 'typescript') {
+    result = obfuscateTs(code, opts);
+}
+outputCode.textContent = result;
+showStatus('Protection applied successfully');
+} catch (e) {
+    outputCode.textContent = '';
+    showStatus('Protection failed: Invalid code or unsupported syntax.', true, true);
+}
+}, 100);
+});
+
+// Handle deobfuscation button click
+deobfuscateBtn.addEventListener('click', () => {
+    const code = codeInput.value.trim();
+    if (!code) {
+        outputCode.textContent = '';
+        showStatus('Please provide code to restore.', true, true);
+        return;
+    }
+
+    showStatus('Processing restoration...');
+    const lang = document.querySelector('.tab.active').dataset.lang;
+    const opts = {
+        varRename: options[0].checked,
+        strEncrypt: options[1].checked,
+        flowFlatten: options[2].checked,
+        deadCode: options[3].checked,
+        compress: options[4].checked
+    };
+
+    setTimeout(() => {
+        try {
+            let result;
+            if (lang === 'html') {
+                result = deobfuscateHtml(code, opts);
+            } else if (lang === 'javascript') {
+                result = deobfuscateJs(code, opts);
+            } else if (lang === 'python') {
+                result = deobfuscatePython(code, opts);
+            } else if (lang === 'java') {
+                result = deobfuscateJava(code, opts);
+            } else if (lang === 'cpp') {
+                result = deobfuscateCpp(code, opts);
+            } else if (lang === 'php') {
+                result = deobfuscatePhp(code, opts);
+            } else if (lang === 'ruby') {
+                result = deobfuscateRuby(code, opts);
+            } else if (lang === 'typescript') {
+                result = deobfuscateTs(code, opts);
+            }
+            outputCode.textContent = result;
+            showStatus('Restoration completed successfully');
+        } catch (e) {
+            outputCode.textContent = '';
+            showStatus('Restoration failed: Invalid code or mapping unavailable.', true, true);
+        }
+    }, 100);
+});
+
+// Obfuscate HTML code, including embedded JavaScript and CSS
+function obfuscateHtml(code, opts) {
+    let html = code;
+    obfuscationMap.html = { vars: {}, strings: {}, scripts: [], styles: [] };
+
+    const scriptRegex = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+    const styleRegex = /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi;
+
+    let scriptIndex = 0;
+    html = html.replace(scriptRegex, script => {
+        const jsCode = script.replace(/<script\b[^>]*>|<\/script>/g, '');
+        if (!jsCode.trim()) return script;
+        const obfuscatedJs = obfuscateJs(jsCode, opts);
+        obfuscationMap.html.scripts[scriptIndex] = { original: jsCode, obfuscated: obfuscatedJs };
+        scriptIndex++;
+        return `<script>${obfuscatedJs}</script>`;
+    });
+
+    let styleIndex = 0;
+    html = html.replace(styleRegex, style => {
+        const cssCode = style.replace(/<style\b[^>]*>|<\/style>/g, '');
+        if (!cssCode.trim()) return style;
+        const obfuscatedCss = obfuscateCss(cssCode, opts);
+        obfuscationMap.html.styles[styleIndex] = { original: cssCode, obfuscated: obfuscatedCss };
+        styleIndex++;
+        return `<style>${obfuscatedCss}</style>`;
+    });
+
+    if (opts.varRename) {
+        html = html.replace(/\b(id|class)=["']([^"']*)["']/g, (m, attr, value) => {
+            const values = value.split(/\s+/);
+            const newValues = values.map(val => {
+                if (!val) return val;
+                const newVal = `_h${Math.random().toString(36).slice(2, 10)}`;
+                obfuscationMap.html.vars[newVal] = val;
+                return newVal;
+            });
+            return `${attr}="${newValues.join(' ')}"`;
+        });
+    }
+
+    if (opts.strEncrypt) {
+        html = html.replace(/>([^<]+)</g, (m, text) => {
+            if (text.trim() && !text.includes('<') && !text.includes('>')) {
+                const encoded = btoa(text.trim()).split('').reverse().join('');
+                obfuscationMap.html.strings[encoded] = text.trim();
+                return `>${encoded}<`;
+            }
+            return m;
+        });
+    }
+
+    if (opts.deadCode) {
+        html = html.replace(/<\/\w+>/g, m => `${m}<script>if(false){Math.random();}</script>`);
+    }
+
+    if (opts.compress) {
+        html = html.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
+    }
+
+    return html;
+}
+
+// Deobfuscate HTML code, restoring original JavaScript and CSS
+function deobfuscateHtml(code, opts) {
+    if (!obfuscationMap.html) throw new Error('No mapping found');
+    let html = code;
+
+    let scriptIndex = 0;
+    html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, script => {
+        const jsCode = script.replace(/<script\b[^>]*>|<\/script>/g, '');
+        if (!jsCode.trim()) return script;
+        const mapEntry = obfuscationMap.html.scripts[scriptIndex] || {};
+        if (!mapEntry.obfuscated || mapEntry.obfuscated !== jsCode) {
+            const deobfuscatedJs = deobfuscateJs(jsCode, opts);
+            scriptIndex++;
+            return `<script>${deobfuscatedJs}</script>`;
+        }
+        scriptIndex++;
+        return `<script>${mapEntry.original}</script>`;
+    });
+
+    let styleIndex = 0;
+    html = html.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, style => {
+        const cssCode = style.replace(/<style\b[^>]*>|<\/style>/g, '');
+        if (!cssCode.trim()) return style;
+        const mapEntry = obfuscationMap.html.styles[styleIndex] || {};
+        if (!mapEntry.obfuscated || mapEntry.obfuscated !== cssCode) {
+            const deobfuscatedCss = deobfuscateCss(cssCode, opts);
+            styleIndex++;
+            return `<style>${deobfuscatedCss}</style>`;
+        }
+        styleIndex++;
+        return `<style>${mapEntry.original}</style>`;
+    });
+
+    if (opts.varRename && obfuscationMap.html.vars) {
+        for (const [newVal, val] of Object.entries(obfuscationMap.html.vars)) {
+            const regex = new RegExp(`\\b(id|class)=["']([^"']*\\b${newVal}\\b[^"']*)["']`, 'g');
+            html = html.replace(regex, (m, attr, value) => {
+                const values = value.split(/\s+/);
+                const originalValues = values.map(v => v === newVal ? val : v);
+                return `${attr}="${originalValues.join(' ')}"`;
+            });
+        }
+    }
+
+    if (opts.strEncrypt && obfuscationMap.html.strings) {
+        for (const [encoded, original] of Object.entries(obfuscationMap.html.strings)) {
+            const escapedEncoded = encoded.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            html = html.replace(new RegExp(`>${escapedEncoded}<`, 'g'), `>${original}<`);
+        }
+    }
+
+    if (opts.deadCode) {
+        html = html.replace(/<script>if\(false\)\{Math\.random\(\);\}<\/script>/g, '');
+    }
+
+    return html;
+}
+
+// Obfuscate JavaScript code
+function obfuscateJs(code, opts) {
+    let result = code;
+    obfuscationMap.js = { vars: {}, strings: {} };
+
+    if (opts.varRename) {
+        result = result.replace(/\b(var|let|const)\s+([a-zA-Z_]\w*)\b/g, (m, prefix, original) => {
+            const newName = `_j${Math.random().toString(36).slice(2, 10)}`;
+            obfuscationMap.js.vars[newName] = original;
+            return `${prefix} ${newName}`;
+        });
+    }
+
+    if (opts.strEncrypt) {
+        result = result.replace(/"([^"]*)"/g, (m, str) => {
+            const encoded = btoa(str).split('').reverse().join('');
+            obfuscationMap.js.strings[encoded] = str;
+            return `"${encoded}"`;
+        });
+    }
+
+    if (opts.flowFlatten) {
+        result = `(() => { let _s = 0; const _states = { 0: () => { ${result}; _s = -1; } }; while(_s >= 0) { _states[_s](); } })();`;
+    }
+
+    if (opts.deadCode) {
+        result = `if(false){console.log(Math.random());}${result}if(false){alert('x');}`;
+    }
+
+    if (opts.compress) {
+        result = result.replace(/\s+/g, ' ').trim();
+    }
+
+    return result;
+}
+
+
+function deobfuscateJs(code, opts) {
+    if (!obfuscationMap.js) throw new Error('No mapping found');
+    let result = code;
+
+    if (opts.deadCode) {
+        result = result.replace(/if\(false\)\{console\.log\(Math\.random\(\)\);\}|if\(false\)\{alert\('x'\);\}/g, '');
+    }
+
+    if (opts.flowFlatten) {
+        const match = result.match(/\(.*?\).*?\{.*?\bwhile\(_s >= 0\).*?\{.*?\}\}.*?\}\(\);/s);
+        if (match) {
+            const inner = match[0].match(/0:.*?\{([^}]*)\}/s)?.[1] || '';
+            result = inner.replace(/;_s = -1;/g, '');
+        }
+    }
+
+    if (opts.strEncrypt && obfuscationMap.js.strings) {
+        for (const [encoded, original] of Object.entries(obfuscationMap.js.strings)) {
+            const escapedEncoded = encoded.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            result = result.replace(new RegExp(`"${escapedEncoded}"`, 'g'), `"${original}"`);
+        }
+    }
+
+    if (opts.varRename && obfuscationMap.js.vars) {
+        for (const [obfuscated, original] of Object.entries(obfuscationMap.js.vars)) {
+            result = result.replace(new RegExp(`\\b${obfuscated}\\b`, 'g'), original);
+        }
+    }
+
+    return result;
+}
+
+
+function obfuscatePython(code, opts) {
+    let result = code;
+    obfuscationMap.python = { vars: {}, strings: {} };
+
+    if (opts.varRename) {
+        result = result.replace(/\b[a-zA-Z_]\w*\b(?=\s*=)/g, m => {
+            const newName = `_p${Math.random().toString(36).slice(2, 10)}`;
+            obfuscationMap.python.vars[newName] = m;
+            return newName;
+        });
+    }
+
+    if (opts.strEncrypt) {
+        result = result.replace(/'([^']*)'/g, (m, str) => {
+            const encoded = str.split('').map(c => String.fromCharCode(c.charCodeAt(0) + 1)).join('');
+            obfuscationMap.python.strings[encoded] = str;
+            return `'${encoded}'`;
+        });
+    }
+
+    if (opts.flowFlatten) {
+        result = `def _obf(): _s = 0; _states = {0: lambda: [${result.replace(/\n/g, ', ')}, None][-1]}; while _s >= 0: _states[_s](); _s = -1\n_obf()`;
+    }
+
+    if (opts.deadCode) {
+        result = `if False: print(random.random())\n${result}\nif False: pass`;
+    }
+
+    if (opts.compress) {
+        result = result.replace(/\s+/g, ' ').replace(/;\s+/g, ';').trim();
+    }
+
+    return result;
+}
+
+            
+function deobfuscatePython(code, opts) {
+    if (!obfuscationMap.python) throw new Error('No mapping found');
+    let result = code;
+
+    if (opts.deadCode) {
+        result = result.replace(/if False: print\(random\.random\(\)\)\n|if False: pass\n/g, '');
+    }
+
+    if (opts.flowFlatten) {
+        const match = result.match(/def _obf.*?while _s >= 0.*?\n_obf\(\)/s);
+        if (match) {
+            const inner = match[0].match(/\[([^[]*),\s*None\]/s)?.[1] || '';
+            result = inner.replace(/,\s*/g, '\n');
+        }
+    }
+
+    if (opts.strEncrypt && obfuscationMap.python.strings) {
+        for (const [encoded, original] of Object.entries(obfuscationMap.python.strings)) {
+            const escapedEncoded = encoded.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            result = result.replace(new RegExp(`'${escapedEncoded}'`, 'g'), `'${original}'`);
+        }
+    }
+
+    if (opts.varRename && obfuscationMap.python.vars) {
+        for (const [obfuscated, original] of Object.entries(obfuscationMap.python.vars)) {
+            result = result.replace(new RegExp(`\\b${obfuscated}\\b`, 'g'), original);
+        }
+    }
+
+    return result;
+}
+
+
+function obfuscateJava(code, opts) {
+    let result = code;
+    obfuscationMap.java = { vars: {}, strings: {} };
+
+    if (opts.varRename) {
+        result = result.replace(/\b(int|double|String)\s+([a-zA-Z_]\w*)\b/g, (m, type, original) => {
+            const newName = `_v${Math.random().toString(36).slice(2, 10)}`;
+            obfuscationMap.java.vars[newName] = original;
+            return `${type} ${newName}`;
+        });
+    }
+
+    if (opts.strEncrypt) {
+        result = result.replace(/"([^"]*)"/g, (m, str) => {
+            const encoded = str.split('').reverse().join('');
+            obfuscationMap.java.strings[encoded] = str;
+            return `"${encoded}"`;
+        });
+    }
+
+    if (opts.flowFlatten) {
+        result = `class Obf { public static void main(String[] args) { int _s = 0; while(_s >= 0) { switch(_s) { case 0: ${result}; _s = -1; break; } } } }`;
+    }
+
+    if (opts.deadCode) {
+        result = `class Obf { static { if(false) System.out.println(Math.random()); } ${result} }`;
+    }
+
+    if (opts.compress) {
+        result = result.replace(/\s+/g, ' ').trim();
+    }
+
+    return result;
+}
+
+
+function deobfuscateJava(code, opts) {
+    if (!obfuscationMap.java) throw new Error('No mapping found');
+    let result = code;
+
+    if (opts.deadCode) {
+        result = result.replace(/static \{ if\(false\) System\.out\.println\(Math\.random\(\)\); \}/g, '');
+    }
+
+    if (opts.flowFlatten) {
+        const match = result.match(/class Obf.*?switch\(_s\).*?case 0: (.*?); _s = -1;/s);
+        if (match) {
+            result = match[1];
+        }
+    }
+
+    if (opts.strEncrypt && obfuscationMap.java.strings) {
+        for (const [encoded, original] of Object.entries(obfuscationMap.java.strings)) {
+            const escapedEncoded = encoded.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            result = result.replace(new RegExp(`"${escapedEncoded}"`, 'g'), `"${original}"`);
+        }
+    }
+
+    if (opts.varRename && obfuscationMap.java.vars) {
+        for (const [obfuscated, original] of Object.entries(obfuscationMap.java.vars)) {
+            result = result.replace(new RegExp(`\\b${obfuscated}\\b`, 'g'), original);
+        }
+    }
+
+    return result;
+}
+
+
+function obfuscateCpp(code, opts) {
+    let result = code;
+    obfuscationMap.cpp = { vars: {}, strings: {} };
+
+    if (opts.varRename) {
+        result = result.replace(/\b(int|double|string)\s+([a-zA-Z_]\w*)\b/g, (m, type, original) => {
+            const newName = `_c${Math.random().toString(36).slice(2, 10)}`;
+            obfuscationMap.cpp.vars[newName] = original;
+            return `${type} ${newName}`;
+        });
+    }
+
+    if (opts.strEncrypt) {
+        result = result.replace(/"([^"]*)"/g, (m, str) => {
+            const encoded = str.split('').reverse().join('');
+            obfuscationMap.cpp.strings[encoded] = str;
+            return `"${encoded}"`;
+        });
+    }
+
+    if (opts.flowFlatten) {
+        result = `int main() { int _s = 0; while(_s >= 0) { switch(_s) { case 0: ${result}; _s = -1; break; } } return 0; }`;
+    }
+
+    if (opts.deadCode) {
+        result = `if(false) { std::cout << std::rand(); } ${result}`;
+    }
+
+    if (opts.compress) {
+        result = result.replace(/\s+/g, ' ').trim();
+    }
+
+    return result;
+}
+
+
+function deobfuscateCpp(code, opts) {
+    if (!obfuscationMap.cpp) throw new Error('No mapping found');
+    let result = code;
+
+    if (opts.deadCode) {
+        result = result.replace(/if\(false\) \{ std::cout << std::rand\(\); \}/g, '');
+    }
+
+    if (opts.flowFlatten) {
+        const match = result.match(/int main\(\).*?switch\(_s\).*?case 0: (.*?); _s = -1;/s);
+        if (match) {
+            result = match[1];
+        }
+    }
+
+    if (opts.strEncrypt && obfuscationMap.cpp.strings) {
+        for (const [encoded, original] of Object.entries(obfuscationMap.cpp.strings)) {
+            const escapedEncoded = encoded.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            result = result.replace(new RegExp(`"${escapedEncoded}"`, 'g'), `"${original}"`);
+        }
+    }
+
+    if (opts.varRename && obfuscationMap.cpp.vars) {
+        for (const [obfuscated, original] of Object.entries(obfuscationMap.cpp.vars)) {
+            result = result.replace(new RegExp(`\\b${obfuscated}\\b`, 'g'), original);
+        }
+    }
+
+    return result;
+}
+
+
+function obfuscatePhp(code, opts) {
+    let result = code;
+    obfuscationMap.php = { vars: {}, strings: {} };
+
+    if (opts.varRename) {
+        result = result.replace(/\$([a-zA-Z_]\w*)\b/g, (m, original) => {
+            const newName = `_p${Math.random().toString(36).slice(2, 10)}`;
+            obfuscationMap.php.vars[newName] = original;
+            return `$${newName}`;
+        });
+    }
+
+    if (opts.strEncrypt) {
+        result = result.replace(/"([^"]*)"/g, (m, str) => {
+            const encoded = btoa(str).split('').reverse().join('');
+            obfuscationMap.php.strings[encoded] = str;
+            return `"${encoded}"`;
+        });
+    }
+
+    if (opts.flowFlatten) {
+        result = `<?php $s = 0; while($s >= 0) { switch($s) { case 0: ${result}; $s = -1; break; } } ?>`;
+    }
+
+    if (opts.deadCode) {
+        result = `<?php if(false) { echo rand(); } ?>${result}`;
+    }
+
+    if (opts.compress) {
+        result = result.replace(/\s+/g, ' ').trim();
+    }
+
+    return result;
+}
+
+
+function deobfuscatePhp(code, opts) {
+    if (!obfuscationMap.php) throw new Error('No mapping found');
+    let result = code;
+
+    if (opts.deadCode) {
+        result = result.replace(/<\?php if\(false\) \{ echo rand\(\); \} \?>/g, '');
+    }
+
+    if (opts.flowFlatten) {
+        const match = result.match(/<\?php \$s = 0;.*?switch\(\$s\).*?case 0: (.*?); \$s = -1;/s);
+        if (match) {
+            result = match[1];
+        }
+    }
+
+    if (opts.strEncrypt && obfuscationMap.php.strings) {
+        for (const [encoded, original] of Object.entries(obfuscationMap.php.strings)) {
+            const escapedEncoded = encoded.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            result = result.replace(new RegExp(`"${escapedEncoded}"`, 'g'), `"${original}"`);
+        }
+    }
+
+    if (opts.varRename && obfuscationMap.php.vars) {
+        for (const [obfuscated, original] of Object.entries(obfuscationMap.php.vars)) {
+            result = result.replace(new RegExp(`\\$${obfuscated}\\b`, 'g'), `$${original}`);
+        }
+    }
+
+    return result;
+}
+
+
+function obfuscateRuby(code, opts) {
+    let result = code;
+    obfuscationMap.ruby = { vars: {}, strings: {} };
+
+    if (opts.varRename) {
+        result = result.replace(/\b([a-zA-Z_]\w*)\s*=/g, (m, original) => {
+            const newName = `_r${Math.random().toString(36).slice(2, 10)}`;
+            obfuscationMap.ruby.vars[newName] = original;
+            return `${newName} =`;
+        });
+    }
+
+    if (opts.strEncrypt) {
+        result = result.replace(/'([^']*)'/g, (m, str) => {
+            const encoded = str.split('').map(c => String.fromCharCode(c.charCodeAt(0) + 1)).join('');
+            obfuscationMap.ruby.strings[encoded] = str;
+            return `'${encoded}'`;
+        });
+    }
+
+    if (opts.flowFlatten) {
+        result = `s = 0; loop do; case s; when 0; ${result}; s = -1; end; break if s < 0; end`;
+    }
+
+    if (opts.deadCode) {
+        result = `if false; puts rand; end; ${result}`;
+    }
+
+    if (opts.compress) {
+        result = result.replace(/\s+/g, ' ').trim();
+    }
+
+    return result;
+}
+
+            
+function deobfuscateRuby(code, opts) {
+    if (!obfuscationMap.ruby) throw new Error('No mapping found');
+    let result = code;
+
+    if (opts.deadCode) {
+        result = result.replace(/if false; puts rand; end;/g, '');
+    }
+
+    if (opts.flowFlatten) {
+        const match = result.match(/s = 0;.*?case s; when 0; (.*?); s = -1;/s);
+        if (match) {
+            result = match[1];
+        }
+    }
+
+    if (opts.strEncrypt && obfuscationMap.ruby.strings) {
+        for (const [encoded, original] of Object.entries(obfuscationMap.ruby.strings)) {
+            const escapedEncoded = encoded.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            result = result.replace(new RegExp(`'${escapedEncoded}'`, 'g'), `'${original}'`);
+        }
+    }
+
+    if (opts.varRename && obfuscationMap.ruby.vars) {
+        for (const [obfuscated, original] of Object.entries(obfuscationMap.ruby.vars)) {
+            result = result.replace(new RegExp(`\\b${obfuscated}\\b`, 'g'), original);
+        }
+    }
+
+    return result;
+}
+
+
+function obfuscateTs(code, opts) {
+    let result = code;
+    obfuscationMap.ts = { vars: {}, strings: {} };
+
+    if (opts.varRename) {
+        result = result.replace(/\b(var|let|const)\s+([a-zA-Z_]\w*)\b/g, (m, prefix, original) => {
+            const newName = `_t${Math.random().toString(36).slice(2, 10)}`;
+            obfuscationMap.ts.vars[newName] = original;
+            return `${prefix} ${newName}`;
+        });
+    }
+
+    if (opts.strEncrypt) {
+        result = result.replace(/"([^"]*)"/g, (m, str) => {
+            const encoded = btoa(str).split('').reverse().join('');
+            obfuscationMap.ts.strings[encoded] = str;
+            return `"${encoded}"`;
+        });
+    }
+
+    if (opts.flowFlatten) {
+        result = `(() => { let _s = 0; const _states = { 0: () => { ${result}; _s = -1; } }; while(_s >= 0) { _states[_s](); } })();`;
+    }
+
+    if (opts.deadCode) {
+        result = `if(false){console.log(Math.random());}${result}if(false){alert('x');}`;
+    }
+
+    if (opts.compress) {
+        result = result.replace(/\s+/g, ' ').trim();
+    }
+
+    return result;
+}
+
+
+function deobfuscateTs(code, opts) {
+    if (!obfuscationMap.ts) throw new Error('No mapping found');
+    let result = code;
+
+    if (opts.deadCode) {
+        result = result.replace(/if\(false\)\{console\.log\(Math\.random\(\)\);\}|if\(false\)\{alert\('x'\);\}/g, '');
+    }
+
+    if (opts.flowFlatten) {
+        const match = result.match(/\(.*?\).*?\{.*?\bwhile\(_s >= 0\).*?\{.*?\}\}.*?\}\(\);/s);
+        if (match) {
+            const inner = match[0].match(/0:.*?\{([^}]*)\}/s)?.[1] || '';
+            result = inner.replace(/;_s = -1;/g, '');
+        }
+    }
+
+    if (opts.strEncrypt && obfuscationMap.ts.strings) {
+        for (const [encoded, original] of Object.entries(obfuscationMap.ts.strings)) {
+            const escapedEncoded = encoded.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            result = result.replace(new RegExp(`"${escapedEncoded}"`, 'g'), `"${original}"`);
+        }
+    }
+
+    if (opts.varRename && obfuscationMap.ts.vars) {
+        for (const [obfuscated, original] of Object.entries(obfuscationMap.ts.vars)) {
+            result = result.replace(new RegExp(`\\b${obfuscated}\\b`, 'g'), original);
+        }
+    }
+
+    return result;
+}
+
+
+function obfuscateCss(code, opts) {
+    let result = code;
+    obfuscationMap.css = { classes: {}, ids: {} };
+
+    if (opts.varRename) {
+        result = result.replace(/\.[a-zA-Z_]\w*/g, (m) => {
+            const newName = `_c${Math.random().toString(36).slice(2, 10)}`;
+            obfuscationMap.css.classes[newName] = m.slice(1);
+            return `.${newName}`;
+        }).replace(/#[a-zA-Z_]\w*/g, (m) => {
+            const newName = `_i${Math.random().toString(36).slice(2, 10)}`;
+            obfuscationMap.css.ids[newName] = m.slice(1);
+            return `#${newName}`;
+        });
+    }
+
+    if (opts.strEncrypt) {
+        result = result.replace(/"([^"]*)"/g, (m, str) => {
+            const encoded = btoa(str).split('').reverse().join('');
+            obfuscationMap.css.strings[encoded] = str;
+            return `"${encoded}"`;
+        });
+    }
+
+    if (opts.compress) {
+        result = result.replace(/\s+/g, ' ').trim();
+    }
+
+    return result;
+}
+
+
+function deobfuscateCss(code, opts) {
+    if (!obfuscationMap.css) throw new Error('No mapping found');
+    let result = code;
+
+    if (opts.strEncrypt && obfuscationMap.css.strings) {
+        for (const [encoded, original] of Object.entries(obfuscationMap.css.strings)) {
+            const escapedEncoded = encoded.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            result = result.replace(new RegExp(`"${escapedEncoded}"`, 'g'), `"${original}"`);
+        }
+    }
+
+    if (opts.varRename && obfuscationMap.css.classes) {
+        for (const [obfuscated, original] of Object.entries(obfuscationMap.css.classes)) {
+            result = result.replace(new RegExp(`\\.${obfuscated}\\b`, 'g'), `.${original}`);
+        }
+    }
+
+    if (opts.varRename && obfuscationMap.css.ids) {
+        for (const [obfuscated, original] of Object.entries(obfuscationMap.css.ids)) {
+            result = result.replace(new RegExp(`#${obfuscated}\\b`, 'g'), `#${original}`);
+        }
+    }
+
+    return result;
+}
+</script>
+                   
